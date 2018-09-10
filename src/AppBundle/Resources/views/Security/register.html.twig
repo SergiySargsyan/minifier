@@ -1,0 +1,17 @@
+{% extends '@App/default_layout.html.twig' %}
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            {{ form_start(form) }}
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email) }}
+            {{ form_widget(form.password) }}
+            {{ form_widget(form.submit) }}
+            {{ form_end(form) }}
+        </div>
+        <div class="col"></div>
+    </div>
+
+{% endblock %}

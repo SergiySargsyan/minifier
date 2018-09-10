@@ -1,0 +1,120 @@
+{% extends '@App/default_layout.html.twig' %}
+
+{% block body %}
+    <div ng-controller="BaseController"
+        ng-init="links={{ links_serialized }};
+        viewLink;";
+    >
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Statistic {[{ viewLink.original_link }]}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                        <h4>Creator {[{ viewLink.creator.email }]}</h4>
+                        <h4>Life time {[{ viewLink.life_time }]}</h4>
+                        <h4>Count views {[{ viewLink.visits.length }]}</h4>
+
+
+                        <table class="table table-striped" ng-if="viewLink.visits.length">
+                            <thead>
+                            <tr>
+                                <td>ip</td>
+                                <td>browser</td>
+                                <td>date</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="visit in viewLink.visits">
+                                <td>{[{ visit.ip_address }]}</td>
+                                <td>{[{ visit.browser }]}</td>
+                                <td>{[{ visit.date|date:'dd.MM.yyyy HH:mm' }]}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <h1>list</h1>
+
+
+        <div align="left">
+            <button style="horiz-align: left" type="button" class="btn btn-primary" ng-click="addLink()">
+                Add Link
+            </button>
+        </div>
+    <table class="table table-striped" ng-if="links">
+        <thead>
+            <tr>
+                <th>Original</th>
+                <th>Short</th>
+                <th>Life</th>
+                <th>Active</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="link in links">
+                <td>
+                    <a href="{[{ link.original_link }]}"  target="_blank" ng-show="!rowform.$visible"
+                       onbeforesave="checkRequired($data)"
+                       editable-text="link.original_link"
+                       e-name="original_link"
+                       e-form="rowform" e-required>
+                        {[{ link.original_link }]}
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ url('link_way') }}/{[{ link.short_link }]}" target="_blank" ng-if="link.is_active && link.short_link">{{ url('link_way') }}/{[{ link.short_link }]}</a>
+                    <p ng-if="!link.is_active && link.short_link">{{ url('link_way') }}/{[{ link.short_link }]}</p>
+                </td>
+                <td>
+                    <span ng-show="!rowform.$visible" editable-datetime="link.life_time" e-name="life_time" e-form="rowform">
+                        {[{ link.life_time|date:'dd.MM.yyyy HH:mm' || "-" }]}
+                    </span>
+                </td>
+                <td>
+                    <span ng-show="!rowform.$visible" editable-checkbox="link.is_active" e-name="is_active" e-form="rowform">
+                        {[{ link.is_active  && "+" || "-" }]}
+                    </span>
+                </td>
+                <td>
+                    <form editable-form name="rowform" onbeforesave="saveLink($data, link)" ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == link">
+                        <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-primary">
+                            save
+                        </button>
+                        <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()" class="btn btn-default">
+                            cancel
+                        </button>
+                    </form>
+                    <div class="buttons" ng-show="!rowform.$visible">
+                        <button type="button" class="btn btn-warning" ng-click="rowform.$show()">edit</button>
+                        <button type="button" class="btn btn-danger" ng-click="removeLink($index, link)">del</button>
+                        <button class="btn btn-info stat-btn" ng-click="showStatistic(link)">view statistic</button>
+                    </div>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+    </div>
+{% endblock %}
